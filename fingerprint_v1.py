@@ -71,35 +71,52 @@ for test in range (0,10):
 total = float(106)    # 106 accessions other than Oxford [107 in total]
 threshold = 20  # threshold length of allelic difference to be useful
 #scores = np.zeros((len(indels),2))
-scores = np.zeros((1,2))
+scores = np.zeros((3,4))
+sstring = []
 
-for loci in range(0,1):
+for loci in range(0,3):
   dbc.execute("SELECT length, count(*) from variants where chromosome=%s and position=%s group by length;", (indels[loci][0], indels[loci][1]))
-  locus = dbc.fetchall()
+  locus = np.array(dbc.fetchall())
+  string = str(int(total) - sum(locus[:,1]))
+  locus = locus[abs(locus[:,0]) > threshold]
+  scores[loci,1]=len(locus)+1
+  scores[loci,2]=1
+  scores[loci,3]=sum(locus[:,1])
+  if (len(locus[locus[:,0]<0]) < len(locus)):
+    locus[:,0] = locus[:,0] + abs(min(locus[:,0]))
+  print string 
+  test = 1
+  at = 0
+  current = np.min(locus[loci,0])
+  for x in range(0, len(locus)):
+    if (locus[x,0] > (test * threshold)) :
+      string = string + "+" + str(sum(locus[at:x-1,1]))
+      scores[loci,2] = scores[loci,2] + 1
+      at=x
+      test = test + 1
+  if (at < x):
+    string = string + "+" + str(sum(locus[at:x,1])) 
+    scores[loci,2] = scores[loci,2] + 1
+  sstring.append( string )
+  scores[loci,0] = scores[loci,3] / (0.5 * total ) 
 
-  lengths = []
-  counts  = []
-  for look in locus:
-    lengths.append(look[0])
-    counts.append(look[1])
-# scores[loci, 0] = int(sum(counts)) / total
-  test = 1  
-  for x in range(0, len(lengths)-1):
-    print "x: " + str(scores[loci,0])
-    if (abs(lengths[x]) >= (test) * threshold):
-       scores[loci, 0] = scores[loci, 0] + ( counts[x] / total )
-       temp = x
-    if (abs(lengths[x]) >= lengths[temp] + (test * threshold)):
-      temp1 = counts[x]
+  print str(scores[loci]) + " > " + string
+
+"""
+if (abs(locus[x][0]) >= (test * threshold)):
+      scores[loci, 0] = scores[loci, 0] + ( counts[x] / (0.5 * total) )
+      temp = x
+    if (abs(locus[x][0]) >= lengths[temp] + (test * threshold)):
+      temp1 = locus[x][1]
       test=test+1
       temp=x
       for y in range(x+1, len(lengths)-1):
-        if (counts[y]>temp1 and abs(lengths[y]) < (test * threshold)):
+        if (locus[y][1]>temp1 and abs(locus[y][0]) < (test * threshold)):
           temp=x
-      scores[loci, 0] = scores[loci, 0] + ( counts[temp] / total )
+      scores[loci, 0] = scores[loci, 0] + ( counts[temp] / (0.5 * total) )
     
-"""    
-    if (abs(lengths[x]) >= (test + 1) * threshold):
+    
+    if (abs(l engths[x]) >= (test + 1) * threshold):
       test = test + 1
     if (abs(lengths[x]) > test * threshold):
       scores[loci, 0] = scores[loci, 0] + ( counts[x] / total )
@@ -111,7 +128,6 @@ for loci in range(0,1):
         else:
           scores[loci, 0] = scores[loci, 0] + ( (counts[y]) / total) 
 """
-print scores
 
 """
       elif (scores[locus][1] == 0):
