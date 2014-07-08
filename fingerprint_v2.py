@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" --- Select good multi-allelic InDels for finger#printing --- 
+""" --- Select good multi-allelic InDels for finger printing --- 
     Bjorn Pieper. MPIPZ. July 2014    """
 
 import MySQLdb
@@ -12,10 +12,13 @@ from copy import deepcopy
 with open('/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/ma_indel_filtrd.csv') as ID:
   indels = list(csv.reader(ID, delimiter=","))
 
+##debug subset
+# indels = [indel for indel in indels if (indel[0] == 'Chr2' and int(indel[1]) == 261863)]
+
 db  = MySQLdb.connect(host="localhost", user="robot", passwd="giveusthetechnology", db="chpoly")
 dbc = db.cursor()
 
-n = 36 #len(indels) 
+n = 4 #len(indels) 
 m = max([int(x[4]) for x in indels])
 total = float(107)    # 107 accessions with Oxford included 
 threshold = 30  # threshold length of allelic difference to be useful
@@ -64,6 +67,11 @@ for loci in range(0,n):
       result2[loci,x] = loc[x,1]
       result3[loci,x] = loc[x,0]
       cumm = cumm + loc[x,1]
+      if (x == len(locus)-1):
+        ox.append(cumm)
+        result1[loci,x] = group
+        result2[loci,x] = loc[x,1]
+        result3[loci,x] = loc[x,0]
     elif ((locus[x,0] >= (thr)) & (group == result1[loci,x-1])):
       ox.append(cumm)
       cumm = loc[x,1] 
@@ -82,6 +90,11 @@ for loci in range(0,n):
       result2[loci,x] = loc[x,1]
       result3[loci,x] = loc[x,0]
       cumm = cumm + loc[x,1]
+      if (x == len(locus)-1):
+        ox.append(cumm)
+        result1[loci,x] = group
+        result2[loci,x] = loc[x,1]
+        result3[loci,x] = loc[x,0]
   if (group > 1 ):
     score.append( sum( [clamp( (float(x)/(total)), 0, ((total/(group+1))/total)) for x in ox[0:len(ox)]] ) )
     egroup.append( ''.join([str(int(x)) + ';' for x in ox[0:len(ox)-1]]+[str(ox[len(ox)-1])]) )
@@ -90,7 +103,7 @@ for loci in range(0,n):
     egroup.append(str(int(ox[0])) + ';' + str(int(total - ox[0])))
   groups.append(group)
 
-with open("/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/test_out.txt", "w") as writer:
+with open("/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/ID_fp_debug_out.txt", "w") as writer:
   for z in range(0,len(score)):
     writer.write(kromo[z] + ",")
     writer.write(str(pos[z]) + ",")
