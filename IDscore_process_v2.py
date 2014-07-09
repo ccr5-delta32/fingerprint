@@ -22,7 +22,7 @@ for x in range(begin,end):
     FILEw = os.path.join("/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/", "results_group_" + str(x) + "_alleles")
     with open(FILEw, "w") as allres: 
         for y in res:
-            dbc.execute("select chromosome as chr, position, group_concat(concat(Allele) separator ' ') as accessions, length, count(*) as n from variants where chromosome=%s and position=%s group by length;", (y[0],y[1]))  
+            dbc.execute("select chromosome as chr, position length, count(*) as n, group_concat(concat(Allele) separator ' ') as accessions from variants where chromosome=%s and position=%s group by length;", (y[0],y[1]))  
             snt = dbc.fetchall()
             
             allres.write(','.join(y)); allres.write("\n")
