@@ -12,11 +12,8 @@ from copy import deepcopy
 with open('/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/ma_indel_filtrd.csv') as ID:
   indels = list(csv.reader(ID, delimiter=","))
 
-## debug subset
-#indels = [indel for indel in indels if indel[1] == '261863' or indel[1] == '137284']
-#indels = indels[0:305]
-#db  = MySQLdb.connect(host="localhost", user="robot", passwd="giveusthetechnology", db="chpoly")
-#dbc = db.cursor()
+db  = MySQLdb.connect(host="localhost", user="robot", passwd="giveusthetechnology", db="chpoly")
+dbc = db.cursor()
 
 n = len(indels) 
 m = max([int(x[4]) for x in indels])
