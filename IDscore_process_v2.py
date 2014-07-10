@@ -8,8 +8,9 @@ import csv
 import re
 import os
 
-score_cutoff = 0.4
-begin = 1; end=7
+score_cutoff1 = 0.2 ; score_cutoff2 = 0.4
+begin = 1 ; end=7
+fileid = '_p2-p4_'
 
 db  = MySQLdb.connect(host="localhost", user="robot", passwd="giveusthetechnology", db="chpoly")
 dbc = db.cursor()
@@ -18,8 +19,8 @@ with open('/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fi
   indels = list(csv.reader(ID, delimiter=","))
 
 for x in range(begin,end):
-    res = sorted([indel for indel in indels if (int(indel[3]) == x and float(indel[4]) > score_cutoff)], key= lambda indel: indel[4],reverse=True)
-    FILEw = os.path.join("/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/", "results_group_" + str(x) + "_alleles")
+    res = sorted([indel for indel in indels if (int(indel[3]) == x and float(indel[4]) > score_cutoff1 and float(indel[4]) < score_cutoff2)], key= lambda indel: indel[4],reverse=True)
+    FILEw = os.path.join("/home/bpuser/ServHome/MPIPZ/genetic_resources/Molec_Markrs+Primers/fingerprint/", "results_group_" + str(x) + "_alleles" + fileid)
     with open(FILEw, "w") as allres: 
         for y in res:
             dbc.execute("select chromosome as chr, position, length as length, count(*) as n, group_concat(concat(Allele) separator ' ') as accessions from variants where chromosome=%s and position=%s group by length;", (y[0],y[1]))  
