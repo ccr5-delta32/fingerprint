@@ -8,9 +8,9 @@ import csv
 import re
 import os
 
-score_cutoff1 = 0.2 ; score_cutoff2 = 0.4
-begin = 1 ; end=7
-fileid = '_p2-p4_'
+score_cutoff1 = 0.2 ; score_cutoff2 = 0.4 # only output Indels with a score between these values
+begin = 1 ; end=7 # choose allele groups to include
+fileid = '_p2-p4_' # will be appended to filename to differentiate from other selections
 
 db  = MySQLdb.connect(host="localhost", user="robot", passwd="giveusthetechnology", db="chpoly")
 dbc = db.cursor()
